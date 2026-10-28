@@ -1,0 +1,5 @@
+package com.example.springDemo.config;
+
+public class CorsConfig {
+
+}

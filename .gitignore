@@ -1,0 +1,36 @@
+# ==========================================================
+# BACKEND (MicroService)
+# ==========================================================
+MicroService/**/target/
+MicroService/**/bin/
+MicroService/**/.metadata/
+MicroService/**/.settings/
+MicroService/**/.project
+MicroService/**/.classpath
+MicroService/**/.factorypath
+MicroService/**/*.class
+MicroService/**/*.jar
+MicroService/**/*.war
+
+# ==========================================================
+# FRONTEND (Frontend)
+# ==========================================================
+Frontend/**/node_modules/
+Frontend/**/build/
+Frontend/**/dist/
+Frontend/**/.env
+Frontend/**/.env.local
+Frontend/**/*.log
+npm-debug.log*
+yarn-debug.log*
+
+# ==========================================================
+# OS & IDE
+# ==========================================================
+.idea/
+*.iml
+.vscode/
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log

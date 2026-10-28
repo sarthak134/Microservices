@@ -1,0 +1,10 @@
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\repository\UserCredentialRepository.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\IdentityServiceApplication.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\config\AuthConfig.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\service\AuthService.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\controller\AuthController.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\config\CustomUserDetails.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\config\CustomUserDetailsService.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\service\JwtService.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\dto\AuthRequest.java
+C:\Csb traing material\identity-service\src\main\java\com\example\authservice\entity\UserCredential.java

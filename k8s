@@ -1,0 +1,440 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: account-service
+  name: account-service
+spec:
+  ports:
+    - name: "8082"
+      port: 8082
+      targetPort: 8082
+  selector:
+    io.kompose.service: account-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: auth-service
+  name: auth-service
+spec:
+  ports:
+    - name: "9898"
+      port: 9898
+      targetPort: 9898
+  selector:
+    io.kompose.service: auth-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.service.nodeport.port: "30080"
+    kompose.service.type: nodeport
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: bank-portal
+  name: bank-portal
+spec:
+  ports:
+    - name: "80"
+      nodePort: 30080
+      port: 80
+      targetPort: 80
+  selector:
+    io.kompose.service: bank-portal
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: customer-service
+  name: customer-service
+spec:
+  ports:
+    - name: "8081"
+      port: 8081
+      targetPort: 8081
+  selector:
+    io.kompose.service: customer-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.service.nodeport.port: "30761"
+    kompose.service.type: nodeport
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: eureka-service
+  name: eureka-service
+spec:
+  ports:
+    - name: "8761"
+      nodePort: 30761
+      port: 8761
+      targetPort: 8761
+  selector:
+    io.kompose.service: eureka-service
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.service.nodeport.port: "30765"
+    kompose.service.type: nodeport
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: gateway-service
+  name: gateway-service
+spec:
+  ports:
+    - name: "8765"
+      nodePort: 30765
+      port: 8765
+      targetPort: 8765
+  selector:
+    io.kompose.service: gateway-service
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: mysqlcontainer
+  name: mysqlcontainer
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+  selector:
+    io.kompose.service: mysqlcontainer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: account-service
+  name: account-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: account-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: account-service
+    spec:
+      containers:
+        - env:
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: JAVA_TOOL_OPTIONS
+              value: -Deureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/ -Deureka.instance.preferIpAddress=true
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysqlcontainer:3306/bank_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+          image: accountserviceimage:latest
+          imagePullPolicy: IfNotPresent
+          name: account-service
+          ports:
+            - containerPort: 8082
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: auth-service
+  name: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: auth-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: auth-service
+    spec:
+      containers:
+        - env:
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: JAVA_TOOL_OPTIONS
+              value: -Deureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/ -Deureka.instance.preferIpAddress=true
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysqlcontainer:3306/bank_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+          image: identityserviceimage:latest
+          imagePullPolicy: IfNotPresent
+          name: auth-service
+          ports:
+            - containerPort: 9898
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.service.nodeport.port: "30080"
+    kompose.service.type: nodeport
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: bank-portal
+  name: bank-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: bank-portal
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+        kompose.image-pull-policy: IfNotPresent
+        kompose.service.nodeport.port: "30080"
+        kompose.service.type: nodeport
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: bank-portal
+    spec:
+      containers:
+        - image: bankfrontend:latest
+          imagePullPolicy: IfNotPresent
+          name: bank-portal
+          ports:
+            - containerPort: 80
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: customer-service
+  name: customer-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: customer-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: customer-service
+    spec:
+      containers:
+        - env:
+            - name: ACCOUNT_SERVICE_URL
+              value: http://account-service:8082
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: JAVA_TOOL_OPTIONS
+              value: -Deureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/ -Deureka.instance.preferIpAddress=true
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysqlcontainer:3306/bank_db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+          image: customerserviceimage:latest
+          imagePullPolicy: IfNotPresent
+          name: customer-service
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.service.nodeport.port: "30761"
+    kompose.service.type: nodeport
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: eureka-service
+  name: eureka-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: eureka-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+        kompose.image-pull-policy: IfNotPresent
+        kompose.service.nodeport.port: "30761"
+        kompose.service.type: nodeport
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: eureka-service
+    spec:
+      containers:
+        - image: eurekaserverimage:latest
+          imagePullPolicy: IfNotPresent
+          name: eureka-service
+          ports:
+            - containerPort: 8761
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.service.nodeport.port: "30765"
+    kompose.service.type: nodeport
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: gateway-service
+  name: gateway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: gateway-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+        kompose.image-pull-policy: IfNotPresent
+        kompose.service.nodeport.port: "30765"
+        kompose.service.type: nodeport
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: gateway-service
+    spec:
+      containers:
+        - env:
+            - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+              value: http://eureka-service:8761/eureka/
+            - name: JAVA_TOOL_OPTIONS
+              value: -Deureka.client.serviceUrl.defaultZone=http://eureka-service:8761/eureka/ -Deureka.instance.preferIpAddress=true
+          image: getwayimages:latest
+          imagePullPolicy: IfNotPresent
+          name: gateway-service
+          ports:
+            - containerPort: 8765
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+    kompose.image-pull-policy: IfNotPresent
+    kompose.version: 1.38.0 (a8f5d1cbd)
+  labels:
+    io.kompose.service: mysqlcontainer
+  name: mysqlcontainer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysqlcontainer
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f docker-compose.yaml -o k8s
+        kompose.image-pull-policy: IfNotPresent
+        kompose.version: 1.38.0 (a8f5d1cbd)
+      labels:
+        io.kompose.service: mysqlcontainer
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: bank_db
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          image: mysql:latest
+          imagePullPolicy: IfNotPresent
+          name: mysqlcontainer
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+      restartPolicy: Always
+

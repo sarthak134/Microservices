@@ -1,0 +1,35 @@
+# ==========================================================
+# 1. BACKEND (Spring Boot / Maven)
+# ==========================================================
+MicroService/**/target/
+MicroService/**/bin/
+MicroService/**/.metadata/
+MicroService/**/.settings/
+MicroService/**/.project
+MicroService/**/.classpath
+MicroService/**/.factorypath
+MicroService/**/*.class
+MicroService/**/*.jar
+MicroService/**/*.war
+
+# ==========================================================
+# 2. FRONTEND (React / Vite)
+# ==========================================================
+banking-frontend-jwt/node_modules/
+banking-frontend-jwt/dist/
+banking-frontend-jwt/.env
+banking-frontend-jwt/.env.local
+banking-frontend-jwt/.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# ==========================================================
+# 3. OS & IDE
+# ==========================================================
+.idea/
+*.iml
+.vscode/
+Thumbs.db
+desktop.ini
+.DS_Store
