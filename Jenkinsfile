@@ -2,6 +2,9 @@ pipeline {
     agent any
 
     environment {
+        // Your exact Docker and Kubernetes paths
+        PATH = "C:\\Users\\HP\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;C:\\ProgramData\\chocolatey\\bin;${env.PATH}"
+
         DOCKER_USER = 'sarthakjos134'
         DOCKER_CREDS = 'dockerhub-credentials'
         TAG = 'latest'
@@ -19,7 +22,6 @@ pipeline {
             steps {
                 echo 'Verifying and packaging backend JARs...'
                 script {
-                    // Uses the project's own Maven wrapper (mvnw.cmd) to ensure compatibility
                     bat '''
                     cd eureka-server && if exist mvnw.cmd (call mvnw.cmd package -DskipTests)
                     cd ..
