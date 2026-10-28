@@ -15,15 +15,24 @@ pipeline {
             }
         }
 
-        stage('2. Build Backend (Maven)') {
+        stage('2. Build Backend (Maven Wrapper)') {
             steps {
-                echo 'Building Java microservices with Maven...'
-                // Build each service using its own pom.xml
-                bat 'mvn -f eureka-server/pom.xml clean package -DskipTests'
-                bat 'mvn -f gateway/pom.xml clean package -DskipTests'
-                bat 'mvn -f identity-service/pom.xml clean package -DskipTests'
-                bat 'mvn -f account-service/pom.xml clean package -DskipTests'
-                bat 'mvn -f customer-service/pom.xml clean package -DskipTests'
+                echo 'Verifying and packaging backend JARs...'
+                script {
+                    // Uses the project's own Maven wrapper (mvnw.cmd) to ensure compatibility
+                    bat '''
+                    cd eureka-server && if exist mvnw.cmd (call mvnw.cmd package -DskipTests)
+                    cd ..
+                    cd gateway && if exist mvnw.cmd (call mvnw.cmd package -DskipTests)
+                    cd ..
+                    cd identity-service && if exist mvnw.cmd (call mvnw.cmd package -DskipTests)
+                    cd ..
+                    cd account-service && if exist mvnw.cmd (call mvnw.cmd package -DskipTests)
+                    cd ..
+                    cd customer-service && if exist mvnw.cmd (call mvnw.cmd package -DskipTests)
+                    cd ..
+                    '''
+                }
             }
         }
 
@@ -31,7 +40,7 @@ pipeline {
             steps {
                 echo 'Building React Vite frontend...'
                 dir('banking-frontend-jwt') {
-                    bat 'npm install'
+                    bat 'npm install --legacy-peer-deps'
                     bat 'npm run build'
                 }
             }
