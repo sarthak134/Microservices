@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Your Docker Hub username from earlier
         DOCKER_USER = 'sarthakjos134'
         DOCKER_CREDS = 'dockerhub-credentials'
         TAG = 'latest'
@@ -19,7 +18,12 @@ pipeline {
         stage('2. Build Backend (Maven)') {
             steps {
                 echo 'Building Java microservices with Maven...'
-                bat 'mvn clean package -DskipTests'
+                // Build each service using its own pom.xml
+                bat 'mvn -f eureka-server/pom.xml clean package -DskipTests'
+                bat 'mvn -f gateway/pom.xml clean package -DskipTests'
+                bat 'mvn -f identity-service/pom.xml clean package -DskipTests'
+                bat 'mvn -f account-service/pom.xml clean package -DskipTests'
+                bat 'mvn -f customer-service/pom.xml clean package -DskipTests'
             }
         }
 
@@ -69,7 +73,6 @@ pipeline {
         stage('5. Deploy to Kubernetes') {
             steps {
                 echo 'Applying deployment to Kubernetes...'
-                // Deploys to your bankapp namespace in Kubernetes
                 bat 'kubectl apply -f k8s -n bankapp'
             }
         }
