@@ -1,4 +1,3 @@
-
 package com.example.authservice.config;
 
 import java.util.List;
@@ -19,13 +18,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.authentication.AuthenticationProvider;
-
 
 @Configuration
 @EnableWebSecurity
 public class AuthConfig {
-
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
@@ -34,53 +30,33 @@ public class AuthConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "http://localhost:5174"
-        ));
-
+        // ✅ Allow requests from any origin (including Kubernetes NodePort 30080)
+        config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        ));
-
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false);
-
-        UrlBasedCorsConfigurationSource source =
-            new UrlBasedCorsConfigurationSource();
-
+        config.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return source;
     }
-
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource,
-            AuthenticationProvider authenticationProvider)   // ← new param
+            AuthenticationProvider authenticationProvider)
             throws Exception {
-
         http
-            .authenticationProvider(authenticationProvider)  // ← new line
-            .cors(cors ->
-                cors.configurationSource(corsConfigurationSource)
-            )
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session ->                    // ← new block
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll() // ← new line
-                .anyRequest().permitAll()
-            );
-
+                .authenticationProvider(authenticationProvider)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+                        .anyRequest().permitAll());
         return http.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -89,12 +65,9 @@ public class AuthConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider =
-            new DaoAuthenticationProvider();
-
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService());
         provider.setPasswordEncoder(passwordEncoder());
-
         return provider;
     }
 
